@@ -173,7 +173,6 @@ begin
       Round(balls[i].GetPosition.y - balls[i].GetRadius),
       Round(balls[i].GetPosition.x + balls[i].GetRadius),
       Round(balls[i].GetPosition.y + balls[i].GetRadius));
-    // balls[i].Move;
 
     if ((balls[i].GetPosition.x - balls[i].GetRadius) <= 0) then
     begin
@@ -208,23 +207,22 @@ begin
         if balls[i].isColide(balls[j]) then
         begin // 1
 
-
-                    d := sqrt(sqr(balls[i].GetPosition.x - balls[j].GetPosition.x) +
-              sqr(balls[i].GetPosition.y - balls[j].GetPosition.y));
-            if d = 0 then d := 0.001;
-            
-            if (d <= balls[i].GetRadius + balls[j].GetRadius) then
-            begin // 2
-              // раздвигаем шары, если расстояние между ними
-              // меньше суммы их радиусов
-              delta := (balls[i].GetRadius + balls[j].GetRadius - d) / 2 + 1;
-              ddx := (balls[j].GetPosition.x - balls[j].GetPosition.x) / d;
-              ddy := (balls[j].GetPosition.y - balls[i].GetPosition.y) / d;
-              balls[i].SetPosition(balls[i].GetPosition.x - ddx * delta,
-                balls[i].GetPosition.y - ddy * delta);
-              balls[j].SetPosition(balls[j].GetPosition.x + ddx * delta,
-                balls[j].GetPosition.y + ddy * delta);
-            end; // 2
+          d := sqrt(sqr(balls[i].GetPosition.x - balls[j].GetPosition.x) +
+            sqr(balls[i].GetPosition.y - balls[j].GetPosition.y));
+          if d = 0 then
+            d := 0.001; //гряхный хак
+          if (d <= balls[i].GetRadius + balls[j].GetRadius) then
+          begin // 2
+            // раздвигаем шары, если расстояние между ними
+            // меньше суммы их радиусов
+            delta := (balls[i].GetRadius + balls[j].GetRadius - d) / 2 + 1;
+            ddx := (balls[j].GetPosition.x - balls[j].GetPosition.x) / d;
+            ddy := (balls[j].GetPosition.y - balls[i].GetPosition.y) / d;
+            balls[i].SetPosition(balls[i].GetPosition.x - ddx * delta,
+              balls[i].GetPosition.y - ddy * delta);
+            balls[j].SetPosition(balls[j].GetPosition.x + ddx * delta,
+              balls[j].GetPosition.y + ddy * delta);
+          end; // 2
 
           if engine = 1 then
           begin // 3
@@ -246,80 +244,7 @@ begin
             balls[i].SetVelocity(vel1 * sin(alpha), vel1 * cos(alpha));
             balls[j].SetVelocity(vel2 * sin(alpha), vel2 * cos(alpha));
           end // 4
-          else if engine = 3 then
-          begin // 5
-            /// //////////////
-
-            /// //////////////
-            /// ////////////////////////////
-            AB := sqrt(sqr(balls[i].GetPosition.x - balls[j].GetPosition.x) +
-              sqr(balls[i].GetPosition.y - balls[j].GetPosition.y));
-            V1 := sqrt(balls[i].GetVelocity.x * balls[i].GetVelocity.x +
-              balls[i].GetVelocity.y * balls[i].GetVelocity.y);
-            V2 := sqrt(balls[j].GetVelocity.x * balls[j].GetVelocity.x +
-              balls[j].GetVelocity.y * balls[j].GetVelocity.y);
-
-            aPrXx := 0;
-            aPrXy := 0;
-            bPrXx := 0;
-            bPrXy := 0;
-            /// /////-ball #1-
-            if V1 > 0 then
-            begin // 6
-              if (balls[j].GetPosition.y - balls[i].GetPosition.y) > 0 then
-                alfaA := arccos
-                  ((balls[j].GetPosition.x - balls[i].GetPosition.x) / AB)
-              else
-                alfaA := -arccos
-                  ((balls[j].GetPosition.x - balls[i].GetPosition.x) / AB);
-              if balls[i].GetVelocity.y > 0 then
-                gammaA := arccos(balls[i].GetVelocity.x / V1)
-              else
-                gammaA := -arccos(balls[i].GetVelocity.x / V1);
-              betaA := gammaA - alfaA;
-
-              aPrX := V1 * cos(betaA);
-              aPrY := V1 * sin(betaA);
-              aPrXx := aPrX * cos(alfaA);
-              aPrXy := aPrX * sin(alfaA);
-              aPrYx := aPrY * sin(alfaA);
-              aPrYy := aPrY * cos(alfaA);
-            end; // 6
-
-            /// ///////////-ball #2-
-            if V2 > 0 then
-            begin
-              if (balls[i].GetPosition.y - balls[j].GetPosition.y) > 0 then
-                alfaB := arccos
-                  ((balls[i].GetPosition.x - balls[j].GetPosition.x) / AB)
-                // =alfaA+pi
-              else
-                alfaB := -arccos
-                  ((balls[i].GetPosition.x - balls[j].GetPosition.x) / AB);
-              if balls[j].GetVelocity.y > 0 then
-                gammaB := arccos(balls[j].GetVelocity.x / V2)
-              else
-                gammaB := -arccos(balls[j].GetVelocity.x / V2);
-              betaB := gammaB - alfaB;
-
-              bPrX := V2 * cos(betaB);
-              bPrY := V2 * sin(betaB);
-              bPrXx := bPrX * cos(alfaB);
-              bPrXy := bPrX * sin(alfaB);
-              bPrYx := bPrY * sin(alfaB);
-              bPrYy := bPrY * cos(alfaB);
-            end;
-            // av := sqrt(sqr(balls[i].GetVelocity.x)+sqr(balls[i].GetVelocity.y)) / (sqrt(sqr(balls[i].GetVelocity.x)+sqr(balls[i].GetVelocity.y)) + sqrt(sqr(balls[j].GetVelocity.x)+sqr(balls[j].GetVelocity.y)));
-            // bv := sqrt(sqr(balls[j].GetVelocity.x)+sqr(balls[j].GetVelocity.y)) / (sqrt(sqr(balls[i].GetVelocity.x)+sqr(balls[i].GetVelocity.y)) + sqrt(sqr(balls[j].GetVelocity.x)+sqr(balls[j].GetVelocity.y)));
-            av := 0.3;
-            bv := 0.7;
-            balls[i].SetVelocity((bPrXx - aPrXx) * bv, (bPrXy - aPrXy) * bv);
-            balls[j].SetVelocity((aPrXx - bPrXx) * av, (aPrXy - bPrXy) * av);
-          end; // 5
-         // balls[j].Move;
         end; // 1
-
-
       end;
     end;
     ChangeVelocity;
