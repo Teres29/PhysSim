@@ -18,7 +18,6 @@ type
     OpenDialog1: TOpenDialog;
     MainMenu1: TMainMenu;
     N1: TMenuItem;
-    N2: TMenuItem;
     N3: TMenuItem;
     N4: TMenuItem;
     N5: TMenuItem;
@@ -26,6 +25,8 @@ type
     N7: TMenuItem;
     EditVx2: TSpinEdit;
     EditVy2: TSpinEdit;
+    SaveDialog1: TSaveDialog;
+    N2: TMenuItem;
     procedure MainTimerTimer(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ChangeVelocity();
@@ -34,6 +35,7 @@ type
     procedure Init();
     procedure N4Click(Sender: TObject);
     procedure LoadData();
+    procedure SaveData();
     procedure N5Click(Sender: TObject);
     procedure N6Click(Sender: TObject);
     procedure N7Click(Sender: TObject);
@@ -47,19 +49,18 @@ type
     { Public declarations }
   end;
 
-const
-  MaxBallsCount = 1000;
-
 var
   BallsCount, r, engine: Integer;
   MainForm: TMainForm;
-  balls: array [1 .. MaxBallsCount] of TBall;
+  balls: array of TBall;
   BallsColor: TColor;
   started: Boolean;
 
 implementation
 
 {$R *.dfm}
+
+uses About;
 
 procedure TMainForm.EditVx2Change(Sender: TObject);
 begin
@@ -96,6 +97,7 @@ procedure TMainForm.Init;
 var
   i: Integer;
 begin
+  SetLength(balls, BallsCount);
   for i := 1 to BallsCount do
   begin
     balls[i] := TBall.Create(Random(MainForm.ClientWidth - 2 * r) + r,
@@ -103,7 +105,7 @@ begin
       Random(r) + r);
     balls[i].SetColor(BallsColor);
   end;
-  balls[1].SetColor(clWhite);
+  balls[1].SetColor(clRed);
   started := true;
   MainForm.Caption := 'PhypSim v1.0 ' + '  Engine: v' + IntToStr(engine) +
     ';  Source:' + ' Generated';
@@ -113,7 +115,7 @@ procedure TMainForm.LoadData;
 var
   inifile: TIniFile;
   cr, cg, cb, i: Integer;
-  randomgen: Integer;
+  randomgen, rad: Integer;
   p, v: TVector;
 begin
   inifile := TIniFile.Create(OpenDialog1.FileName);
@@ -127,19 +129,23 @@ begin
   randomgen := inifile.ReadInteger('Main', 'RandomGen', 1);
   if randomgen = 0 then
   begin
+    SetLength(balls, BallsCount);
     for i := 1 to BallsCount do
     begin
       p.x := inifile.ReadInteger('Ball' + IntToStr(i), 'posx', 100);
       p.y := inifile.ReadInteger('Ball' + IntToStr(i), 'posy', 100);
       v.x := inifile.ReadInteger('Ball' + IntToStr(i), 'velx', 5);
       v.y := inifile.ReadInteger('Ball' + IntToStr(i), 'vely', 5);
+      rad := inifile.ReadInteger('Ball' + IntToStr(i), 'rad', 5);
       balls[i] := TBall.Create(p.x, p.y, v.x, v.y, RandomRange(r, 2 * r));
       balls[i].SetColor(BallsColor);
+      balls[i].SetRadius(rad);
     end;
     started := true;
   end
   else
     Init;
+  balls[1].SetColor(clRed);
   MainForm.Caption := 'PhypSim v1.0 ' + '  Engine: v' + IntToStr(engine) +
     ';  Source:' + ' Loaded from: ' + OpenDialog1.FileName;
 end;
@@ -147,18 +153,10 @@ end;
 procedure TMainForm.MainTimerTimer(Sender: TObject);
 var
   i, j: Integer;
-  alpha: double;
+  alpha: extended;
   v: TVector;
   vel1, vel2: extended;
-
-  //
-  AB, aa, bb, V1, V2, aPrXx, aPrXy, aPrYx, aPrYy, aPrX, aPrY, bPrXx, bPrXy,
-    bPrYx, bPrYy, bPrX, bPrY, alfaA, betaA, gammaA, alfaB, betaB,
-    gammaB: extended;
-  av, bv: extended;
-
-  //
-  d, delta, ddx, ddy: real;
+  d, delta, ddx, ddy: extended;
 begin
   Image.Repaint;
   Image.Canvas.Brush.Color := MainForm.Color;
@@ -253,12 +251,12 @@ end;
 
 procedure TMainForm.N2Click(Sender: TObject);
 begin
-  ShowMessage('Function not availble in this version');
+  MainForm.Close;
 end;
 
 procedure TMainForm.N3Click(Sender: TObject);
 begin
-  ShowMessage('Function not availble in this version');
+  AboutForm.ShowModal;
 end;
 
 procedure TMainForm.N4Click(Sender: TObject);
@@ -297,7 +295,61 @@ end;
 
 procedure TMainForm.N7Click(Sender: TObject);
 begin
-  ShowMessage('Function not availble in this version');
+  SaveData;
+end;
+
+procedure TMainForm.SaveData;
+var
+  inifile: TIniFile;
+  i: integer;
+  FName, path: string;
+begin
+if SaveDialog1.Execute then
+  begin
+    path := ExtractFilePath(SaveDialog1.FileName);
+    FName := ChangeFileExt(ExtractFileName(SaveDialog1.FileName), '.ini');
+    SaveDialog1.FileName:=(path+FName);
+    inifile := TIniFile.Create(SaveDialog1.FileName);
+  inifile.WriteInteger('Main', 'BallsCount', BallsCount);
+  inifile.WriteInteger('Main', 'Engine', engine);
+  inifile.WriteInteger('Main', 'BallsRad', r);
+  inifile.WriteInteger('Main', 'BallColorR', GetRValue(BallsColor));
+  inifile.WriteInteger('Main', 'BallColorG', GetGValue(BallsColor));
+  inifile.WriteInteger('Main', 'BallColorB', GetBValue(BallsColor));
+  inifile.WriteInteger('Main', 'RandomGen', 0);
+  for i := 1 to BallsCount do
+  begin
+    inifile.WriteInteger('Ball' + IntToStr(i), 'posx', Round(balls[i].GetPosition.x));
+    inifile.WriteInteger('Ball' + IntToStr(i), 'posy', Round(balls[i].GetPosition.y));
+    inifile.WriteInteger('Ball' + IntToStr(i), 'velx', Round(balls[i].GetVelocity.x));
+    inifile.WriteInteger('Ball' + IntToStr(i), 'vely', Round(balls[i].GetVelocity.y));
+    inifile.WriteInteger('Ball' + IntToStr(i), 'rad', Round(balls[i].GetRadius));
+  end;
+  end;
+
+{
+
+
+  begin
+    SetLength(balls, BallsCount);
+    for i := 1 to BallsCount do
+    begin
+      p.x := inifile.ReadInteger('Ball' + IntToStr(i), 'posx', 100);
+      p.y := inifile.ReadInteger('Ball' + IntToStr(i), 'posy', 100);
+      v.x := inifile.ReadInteger('Ball' + IntToStr(i), 'velx', 5);
+      v.y := inifile.ReadInteger('Ball' + IntToStr(i), 'vely', 5);
+      balls[i] := TBall.Create(p.x, p.y, v.x, v.y, RandomRange(r, 2 * r));
+      balls[i].SetColor(BallsColor);
+    end;
+    started := true;
+  end
+  else
+    Init;
+  MainForm.Caption := 'PhypSim v1.0 ' + '  Engine: v' + IntToStr(engine) +
+    ';  Source:' + ' Loaded from: ' + OpenDialog1.FileName;
+end;
+
+}
 end;
 
 procedure TMainForm.ChangeVelocity;

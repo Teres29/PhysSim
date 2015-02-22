@@ -22,10 +22,7 @@ object MainForm: TMainForm
     Width = 1008
     Height = 729
     Align = alClient
-    ExplicitLeft = 159
-    ExplicitTop = 288
-    ExplicitWidth = 105
-    ExplicitHeight = 105
+    ExplicitLeft = -8
   end
   object EditVx: TSpinEdit
     Left = 64
@@ -92,6 +89,7 @@ object MainForm: TMainForm
     Top = 120
     object N1: TMenuItem
       Caption = #1060#1091#1085#1082#1094#1080#1080
+      ShortCut = 16471
       object N6: TMenuItem
         Caption = #1057#1075#1077#1085#1077#1088#1080#1088#1086#1074#1072#1090#1100
         ShortCut = 16462
@@ -110,16 +108,24 @@ object MainForm: TMainForm
       object N7: TMenuItem
         Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
         ShortCut = 16467
-        OnClick = N7Click
+        OnClick = N2Click
       end
-    end
-    object N2: TMenuItem
-      Caption = #1055#1086#1084#1086#1097#1100
-      OnClick = N2Click
+      object N2: TMenuItem
+        Caption = #1042#1099#1081#1090#1080
+        ShortCut = 16471
+        OnClick = N2Click
+      end
     end
     object N3: TMenuItem
       Caption = #1054' '#1087#1088#1086#1075#1088#1072#1084#1084#1077
+      ShortCut = 16449
       OnClick = N3Click
     end
+  end
+  object SaveDialog1: TSaveDialog
+    DefaultExt = 'ini'
+    Filter = 'INI configuration file|*.ini'
+    Left = 768
+    Top = 232
   end
 end
