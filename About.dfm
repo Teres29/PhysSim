@@ -1,7 +1,7 @@
-object Form1: TForm1
+object AboutForm: TAboutForm
   Left = 0
   Top = 0
-  Caption = 'Form1'
+  Caption = 'AboutForm'
   ClientHeight = 299
   ClientWidth = 635
   Color = clBtnFace

@@ -108,7 +108,7 @@ object MainForm: TMainForm
       object N7: TMenuItem
         Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
         ShortCut = 16467
-        OnClick = N2Click
+        OnClick = N7Click
       end
       object N2: TMenuItem
         Caption = #1042#1099#1081#1090#1080
