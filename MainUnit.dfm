@@ -33,6 +33,7 @@ object MainForm: TMainForm
     MinValue = 0
     TabOrder = 0
     Value = 0
+    Visible = False
     OnChange = EditVxChange
   end
   object EditVy: TSpinEdit
@@ -44,6 +45,7 @@ object MainForm: TMainForm
     MinValue = 0
     TabOrder = 1
     Value = 0
+    Visible = False
     OnChange = EditVyChange
   end
   object EditVx2: TSpinEdit
@@ -55,6 +57,7 @@ object MainForm: TMainForm
     MinValue = 0
     TabOrder = 2
     Value = 0
+    Visible = False
     OnChange = EditVx2Change
   end
   object EditVy2: TSpinEdit
@@ -66,6 +69,7 @@ object MainForm: TMainForm
     MinValue = 0
     TabOrder = 3
     Value = 0
+    Visible = False
     OnChange = EditVy2Change
   end
   object MainTimer: TTimer
